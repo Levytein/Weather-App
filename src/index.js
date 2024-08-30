@@ -23,13 +23,13 @@ const convertDateToDayOfWeek = (dateString) => {
 const renderArrows = () => {
   const screenWidth = window.innerWidth;
 
-  if (screenWidth >= 1024) { // Check if the screen width is 640px or larger
+  if (screenWidth === 1920) { // Check if the screen width is exactly 1920px
     return `
       <button id="leftArrow" class="absolute btn btn-outline left-0 xl:top-[45%] bg-gray-800 p-3 rounded-full text-white"><</button>
       <button id="rightArrow" class="btn btn-outline absolute right-0 xl:top-[45%] bg-gray-800 p-3 rounded-full text-white">></button>
     `;
   } else {
-    return ''; // Return empty string to not render arrows on mobile
+    return ''; // Return empty string to not render arrows if screen width is not 1920px
   }
 };
 const showData = (weatherData) => {
@@ -90,12 +90,16 @@ const showData = (weatherData) => {
     dailyForecastHTML += `
     <div class="flex bg-slate-950/60 border border-slate-950/60 xl:flex-col md:h-11/12 md:max-h-full rounded-xl xl:min-w-52 xl:max-w-28 lg:min-w-28 sm:max-h-20 h-full items-center justify-around sm:flex-row ">
       <div class="flex sm:flex-row xl:flex-col xl:items-center h-full justify-center sm:w-10/12">
-        <div class="flex font-bold xl:text-3xl sm:w-3/5 sm:text-base xl:w-full items-center justify-center xl:mt-3 xl:h-1/5"><p>${timeString}</p></div>
-          <i class="flex ${hourConditionsIcon} xl:text-7xl sm:text-xl "></i>
-        <div class="flex font-bold xl:text-3xl sm:text-2xl xl:w-full xl:mt-6 items-center justify-center xl:h-2/5">${dayTemp}°F</div>
+        <div class="flex font-bold xl:text-3xl sm:w-3/5 sm:text-base xl:w-full items-center xl:mt-3 xl:ml-0 xl:justify-center sm:ml-16"><p>${timeString}</p></div>
+        <div class="flex items-center xl:w-full sm:w-1/5 justify-center  xl:h-2/5 xl:mt-14"><i class=" ${hourConditionsIcon} xl:text-7xl sm:text-xl"></i></div>
+        <div class="flex font-bold xl:text-3xl sm:text-2xl xl:w-full xl:mt-6 items-center justify-center xl:h-2/5 sm:w-1/3 ">${dayTemp}°F</div>
       </div>
     </div>
+
+
+      
   `;
+  
   });
 
   dailyForecastHTML += `</div>`;
@@ -135,30 +139,29 @@ const showData = (weatherData) => {
     ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     const hourTemp = hour.temp;
-    const hourConditions = hour.conditions;
+    const hourConditions = hour.conditions.split(',')[0].trim();
     const hourConditionsIcon = getWeatherIcon(String(hourConditions));
 
     hourlyForecastHTML += `
-             <div class="flex bg-slate-950/60 border border-slate-950/60 xl:flex-col md:h-11/12 md:max-h-full rounded-xl xl:min-w-52 xl:max-w-28 lg:min-w-28 sm:max-h-20 h-full items-center justify-around sm:flex-row ">
-        <div class="flex sm:flex-row xl:flex-col xl:items-center h-full justify-center sm:w-10/12">
-          <div class="flex font-bold xl:text-3xl sm:w-3/5 sm:text-base xl:w-full items-center justify-center xl:mt-3 xl:h-1/5"><p>${time}</p></div>
-          <div class="flex items-center xl:w-full sm:w-1/5 justify-center xl:h-2/5 xl:mt-14"><i class="${hourConditionsIcon} xl:text-7xl sm:text-xl "></i></div>
-          <div class="flex font-bold xl:text-3xl sm:text-2xl xl:w-full xl:mt-6 items-center justify-center xl:h-2/5">${hourTemp}°F</div>
-        </div>
+          <div class="flex bg-slate-950/60 border border-slate-950/60 xl:flex-col md:h-11/12 md:max-h-full rounded-xl xl:min-w-52 xl:max-w-28 lg:min-w-28 sm:max-h-20 h-full items-center justify-around sm:flex-row ">
+      <div class="flex sm:flex-row xl:flex-col xl:items-center h-full justify-center sm:w-10/12">
+        <div class="flex font-bold xl:text-3xl sm:w-3/5 sm:text-base xl:w-full items-center xl:mt-3 xl:ml-0 xl:justify-center sm:ml-16"><p>${time}</p></div>
+        <div class="flex items-center xl:w-full sm:w-1/5 justify-center  xl:h-2/5 xl:mt-14"><i class=" ${hourConditionsIcon} xl:text-7xl sm:text-xl"></i></div>
+        <div class="flex font-bold xl:text-3xl sm:text-2xl xl:w-full xl:mt-6 items-center justify-center xl:h-2/5 sm:text-left sm:w-1/3"><p>${hourTemp}°F</p></div>
       </div>
+    </div>
         `;
      
   });
-
+  const todayConditonIcon = weatherData.days[0].conditions.split(",")[0].trim();
   hourlyForecastHTML += `</div>`;
   const mainConditionsIcon = getWeatherIcon(
-    String(weatherData.days[0].conditions)
+    String(todayConditonIcon)
   );
   // Display weather data in the container
   container.innerHTML = `
-  <div class="flex flex-col items-center text-white w-full p-4 >
-    <!-- Header -->
-    <h1 class="text-5xl font-bold mb-4 text-center sm:text-xl sm:hidden">The Weatherinator</h1>
+  <div class="flex flex-col items-center text-white w-full p-4">
+    <p class="font-bold xl:text-3xl mb-3 text-center lg:block sm:text-xl sm:hidden">The Weatherinator</p>
     
     <!-- City Input Field -->
     <div class="flex items-center space-x-4 mb-8 sm:mb-2">
@@ -237,11 +240,11 @@ const showData = (weatherData) => {
         <button id="dailyBtn" class="btn btn-outline text-white">Daily</button>
       </div>
     <!-- Forecast Section -->
-    <div class="flex flex-col grow text-white rounded-xl xl:w-2/3  sm:max-h-96 lg:w-[66%] sm:w-full p-3 pl-5 shadow-xl sm:shadow-none sm:mt-0 mb-4 ml-auto mr-auto">
+    <div class="flex flex-col grow text-white rounded-xl xl:w-2/3  sm:max-h-96 lg:w-[66%] sm:w-full pl-5 shadow-xl sm:shadow-none sm:mt-0 mb-4 ml-auto mr-auto">
   
-      <div id="bottomContainer" class="relative h-full">
+      <div id="bottomContainer" class="relative h-full xl:w-[98%]">
         ${renderArrows()}
-        <div id="forecastContainer" class="overflow-auto flex h-full xl:w-11/12 lg:w-10/12 md:w-4/6 sm:w-full ml-auto mr-auto sm:overflow-y-auto xl:overflow-y-hidden">
+        <div id="forecastContainer" class="overflow-auto flex h-full xl:w-11/12 lg:w-10/12 md:w-4/6 sm:w-full ml-auto mr-auto sm:overflow-y-auto xl:overflow-y-hidden box-border ">
           ${dailyForecastHTML}
         </div>
       </div>
@@ -263,8 +266,16 @@ const showData = (weatherData) => {
   scrollAmount = 0;
 
   // Ensure that the left arrow is hidden initially and right arrow is shown
-  document.getElementById('leftArrow').style.display = 'none';
-  document.getElementById('rightArrow').style.display = 'block';
+  if(document.getElementById('leftArrow'))
+    {
+      document.getElementById('leftArrow').style.display = 'none';
+
+    }
+    if( document.getElementById('rightArrow'))
+    {
+      document.getElementById('rightArrow').style.display = 'block';
+
+    }
 };
 
 const addArrowListeners = () => {
@@ -273,18 +284,23 @@ const addArrowListeners = () => {
   const rightArrow = document.getElementById('rightArrow');
 
   // Function to enable arrow functionality on larger screens
+  // Function to enable arrow functionality on larger screens
   const enableArrowListeners = () => {
-    
-    // Remove existing event listeners to avoid duplicates
-    leftArrow.replaceWith(leftArrow.cloneNode(true));
-    rightArrow.replaceWith(rightArrow.cloneNode(true));
+    // Check if the arrows exist before attempting to replace them
+    if (leftArrow) {
+      leftArrow.replaceWith(leftArrow.cloneNode(true));
+    }
+    if (rightArrow) {
+      rightArrow.replaceWith(rightArrow.cloneNode(true));
+    }
+   
 
     const newLeftArrow = document.getElementById('leftArrow');
     const newRightArrow = document.getElementById('rightArrow');
 
     let scrollAmount = 0;
     const containerWidth = forecastContainer.offsetWidth;
-    const itemWidth = containerWidth + 20; 
+    const itemWidth = containerWidth + 40; 
     const maxScroll = containerWidth * 2; 
 
     newLeftArrow.style.display = 'none';
@@ -325,21 +341,14 @@ const addArrowListeners = () => {
   };
 
   // Function to disable arrow functionality on smaller screens
-  const disableArrowListeners = () => {
-    leftArrow.replaceWith(leftArrow.cloneNode(true));
-    rightArrow.replaceWith(rightArrow.cloneNode(true));
-  };
-
+  
   // Media query to detect screen size changes
-  const mediaQuery = window.matchMedia('(min-width: 1024px)'); // 640px is the breakpoint for 'sm' in Tailwind
+  const mediaQuery = window.matchMedia('(min-width: 1920px)');
 
   const handleScreenChange = (e) => {
     if (e.matches) {
       // Screen is larger than 640px
       enableArrowListeners();
-    } else {
-      // Screen is smaller than 640px
-      disableArrowListeners();
     }
   };
 
@@ -348,7 +357,7 @@ const addArrowListeners = () => {
 
  
   // Listen for screen size changes
-  mediaQuery.addListener(handleScreenChange);
+mediaQuery.addEventListener("change", handleScreenChange);
 };
 
 // Event listeners for switching between hourly and daily views
@@ -372,12 +381,30 @@ const addEventListeners = () => {
       alert("Please enter a city name.");
     }
   });
+  window.addEventListener('resize', () => {
+    const screenWidth = window.innerWidth;
+
+    // Remove existing arrows
+    const leftArrow = document.getElementById('leftArrow');
+    const rightArrow = document.getElementById('rightArrow');
+    if (leftArrow) leftArrow.remove();
+    if (rightArrow) rightArrow.remove();
+
+    // Re-render arrows based on the new screen width
+    if (screenWidth === 1920) {
+      document.getElementById('bottomContainer').insertAdjacentHTML('afterbegin', renderArrows());
+      addArrowListeners();
+    }
+  });
 };
 
 // Initial call to set up everything
 addEventListeners();
 resetScroll();
-addArrowListeners();
+if(document.getElementById('leftArrow') && document.getElementById('rightArrow'))
+{
+  addArrowListeners();
+}
 document.getElementById('forecastContainer').innerHTML = `${dailyForecastHTML}`; // Default view
 }
 
